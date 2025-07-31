@@ -9,8 +9,10 @@ import { pipeline } from 'stream/promises'
 const app = express()
 
 for (const node of config.NODE) {
-  app.use('/' + node.name, express.static(node.path), serveIndex(node.path, { 'icons': true }))
+  app.use('/' + node.name, express.static(node.path), serveIndex(node.path, { 'icons': true, view: 'details', template: path.resolve('./pages/directory.html') }))
 }
+
+app.use('/web', express.static(path.resolve('./pages/components')))
 
 const generateLinks = () => {
   return config.NODE
@@ -40,7 +42,7 @@ app.get('/', async (req, res, next) => {
     })
 
     await pipeline(
-      fs.createReadStream(path.resolve('./index.html')),
+      fs.createReadStream(path.resolve('./pages/index.html')),
       replaceStream,
       res
     )
