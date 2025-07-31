@@ -8,47 +8,32 @@ import { pipeline } from 'stream/promises'
 
 const app = express()
 
-const links = []
-
 for (const node of config.NODE) {
   app.use('/' + node.name, express.static(node.path), serveIndex(node.path, { 'icons': true }))
-  links.push(`
-    <li>
-      <a href="/${node.name}" class="icon icon-directory" title="test-nvim">
-        <span class="name">📁${node.name}</span>
-      </a>
-    </li>
-  `)
 }
 
-// 第一版：生成一个新的index.html
-// const templateContent = fs.readFileSync('index.template.html', 'utf8')
-// const renderContent = templateContent.replace('<!-- links -->', links.join(''))
-// fs.writeFileSync('index.html', renderContent)
+const generateLinks = () => {
+  return config.NODE
+    .map(node => {
+      return `
+        <li>
+          <a href="/${node.name}" class="icon icon-directory" title="test-nvim">
+            <span class="name">📁${node.name}</span>
+          </a>
+        </li>
+      `
+    })
+    .join('')
+}
 
-// app.get('/', (req, res) => {
-//   res.sendFile(path.resolve('./index.html'))
-// })
-
-// 第二版：直接返回index.html
-// app.get('/', (req, res, next) => {
-//   try {
-//     const templateContent = fs.readFileSync(path.resolve('./index.html'), 'utf8')
-//     const renderContent = templateContent.toString().replace('<!-- links -->', links.join(''))
-
-//     res.send(renderContent)
-//   } catch (error) {
-//     next(error)
-//   }
-// })
-
-// 第三版：使用流式处理
 app.get('/', async (req, res, next) => {
   try {
+    // 创建一个转换流用于替换模板中的占位符
     const replaceStream = new Transform({
       transform(chunk, encoding, callback) {
         const templateContent = chunk.toString()
-        const renderContent = templateContent.replace('<!-- links -->', links.join(''))
+        // 替换 <!-- links --> 为动态生成的链接列表
+        const renderContent = templateContent.replace('<!-- links -->', generateLinks())
         this.push(renderContent)
         callback()
       }
