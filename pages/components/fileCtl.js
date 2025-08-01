@@ -168,6 +168,8 @@ class FileList extends HTMLElement {
 
   handleContextMenu(event) {
     const link = event.target.closest('a');
+    if (link.firstChild.textContent === '..')
+      return;
     if (!link) {
       this.closeContextMenu();
       return;
