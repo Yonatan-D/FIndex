@@ -44,7 +44,7 @@ app.use((req, res, next) => {
 
     archive.on('error', (err) => { throw err })
 
-    zip.pipe(archive);
+    zip.pipe(archive)
     zip.directory(absolutePath, false)
     zip.finalize()
 
@@ -55,8 +55,8 @@ app.use((req, res, next) => {
         console.log('[Download] File sent successfully: %s', zipPath)
         // 成功后也清理临时文件
         try {
-          fs.unlinkSync(zipPath);
-          console.log('[Download] Cleaned up temporary file: %s', zipPath);
+          fs.unlinkSync(zipPath)
+          console.log('[Download] Cleaned up temporary file: %s', zipPath)
         } catch (cleanupErr) {
           console.error('[Download] Failed to clean up temporary file: %s', zipPath, cleanupErr)
         }
@@ -79,7 +79,11 @@ app.use((req, res, next) => {
 })
 
 for (const node of config.NODE) {
-  app.use('/' + node.name, express.static(node.path), serveIndex(node.path, { 'icons': true, view: 'details', template: path.resolve('./pages/directory.html') }))
+  app.use(`/${node.name}`, express.static(node.path), serveIndex(node.path, {
+    icons: true,
+    view: 'details',
+    template: path.resolve('./pages/directory.html')
+  }))
   console.log(node.name + ': ' + node.path)
 }
 
