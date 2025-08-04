@@ -17,7 +17,9 @@
   },
   "dependencies": {
     "archiver": "^7.0.1",
+    "dayjs": "^1.11.13",
     "express": "^5.1.0",
+    "filesize": "^11.0.2",
     "serve-index": "^1.9.1"
   }
 }
