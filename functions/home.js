@@ -2,7 +2,7 @@ import fs from 'fs'
 import path from 'path'
 import { Transform } from 'stream'
 import { pipeline } from 'stream/promises'
-import config from './config.js'
+import config from '../config.js'
 
 const generateLinks = () => {
   return config.NODE.map((node) => {
