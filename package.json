@@ -20,6 +20,7 @@
     "dayjs": "^1.11.13",
     "express": "^5.1.0",
     "filesize": "^11.0.2",
+    "mime-types": "~2.1.17",
     "serve-index": "^1.9.1"
   }
 }
