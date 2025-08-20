@@ -9,7 +9,7 @@ import relativeTime from 'dayjs/plugin/relativeTime.js'
 dayjs.locale('zh-cn')
 dayjs.extend(relativeTime)
 
-const ICONS = {
+const icons = {
   // base icons
   'default': 'page_white.png',
   'folder': 'folder.png',
@@ -120,26 +120,101 @@ const ICONS = {
   '.yaws': 'page_white_code.png'
 };
 
+const cache = {}
+
 export default async (locals, callback) => {
+  const load = (icon) => {
+    if (cache[icon]) return cache[icon];
+    return cache[icon] = fs.readFileSync(path.resolve(`./pages/icons/${icon}`), 'base64');
+  }
+
+  const getStyle = (fileList) => {
+    const rules = {};
+    fileList.forEach(file => {
+      const icon = getIcon(file.name);
+      if (!rules[icon.className]){
+        rules[icon.className] = {
+          selector: `#files .${icon.className} .name`,
+          content: `background-image: url(data:image/png;base64,${load(icon.fileName)});`,
+        }
+      }
+    })
+    rules['icon-directory'] = {
+      selector: '#files .icon-directory .name',
+      content: `background-image: url(data:image/png;base64,${load(icons.folder)});`,
+    }
+    const style = [];
+    for (const iconName in rules) {
+      style.push(`${rules[iconName].selector} {\n  ${rules[iconName].content}\n}`);
+    }
+    return style.join('\n');
+  }
+
+  function getIcon(filename) {
+    const ext = path.extname(filename);
+  
+    // try by extension
+    if (icons[ext]) {
+      return {
+        className: 'icon-' + ext.substring(1),
+        fileName: icons[ext]
+      };
+    }
+  
+    const mimetype = mime.lookup(ext);
+  
+    // default if no mime type
+    if (mimetype === false) {
+      return {
+        className: 'icon-default',
+        fileName: icons.default
+      };
+    }
+  
+    // try by mime type
+    if (icons[mimetype]) {
+      return {
+        className: 'icon-' + mimetype.replace('/', '-'),
+        fileName: icons[mimetype]
+      };
+    }
+  
+    const suffix = mimetype.split('+')[1];
+  
+    if (suffix && icons['+' + suffix]) {
+      return {
+        className: 'icon-' + suffix,
+        fileName: icons['+' + suffix]
+      };
+    }
+  
+    const type = mimetype.split('/')[0];
+  
+    // try by type only
+    if (icons[type]) {
+      return {
+        className: 'icon-' + type,
+        fileName: icons[type]
+      };
+    }
+  
+    return {
+      className: 'icon-default',
+      fileName: icons.default
+    };
+  }
+
   const getClassName = (file) => {
     const classes = [];
     const isDir = file.stat && file.stat.isDirectory();
     
     if (locals.displayIcons) {
       classes.push('icon');
-
       if (isDir) {
         classes.push('icon-directory');
       } else {
-        const ext = path.extname(file.name);
-        const mimetype = mime.lookup(file.name);
-        const icon = (ICONS[ext] && ext.substring(1)) || 
-                  (ICONS[mimetype] && mimetype.replace('/', '-')) || 
-                  mimetype.split('+')[1] ||
-                  mimetype.split('/')[0] ||
-                  'default';
-
-        classes.push('icon-' + icon);
+        const icon = getIcon(file.name)
+        classes.push(icon.className);
       }
     }
 
@@ -170,6 +245,7 @@ export default async (locals, callback) => {
   let renderContent = fs.readFileSync(path.resolve("./pages/directory.html"), 'utf-8');
   renderContent = renderContent.replace("{linked-path}", locals.directory);
   renderContent = renderContent.replace("{files}", generateFileList(locals.fileList));
+  renderContent = renderContent.replace("{style}", getStyle(locals.fileList));
 
   callback(null, renderContent);
 }
