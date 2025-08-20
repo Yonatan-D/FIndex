@@ -9,7 +9,7 @@ const generateLinks = () => {
     return `
           <li>
             <a href="/${node.name}" class="icon icon-directory" title="test-nvim">
-              <span class="name">${node.name}</span>
+              <span class="name">📁 ${node.name}</span>
             </a>
           </li>
         `;
