@@ -174,7 +174,7 @@ ul#files.view-details li.header {
   width: 10%;
 }
 .view-details .date {
-  width: 30%;
+  width: calc(30% - 17px);
 }
 .view-details .size,
 .view-details .date {

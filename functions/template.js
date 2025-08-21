@@ -222,17 +222,27 @@ export default async (locals, callback) => {
   }
 
   const generateFileList = (fileList) => {
-    let list = fileList.map(file =>
-      `<li style="width: 100%">
-        <a class="${getClassName(file)}" href="${file.name}">
-          <span class="name">${file.name}</span>
-          <span class="date">${dayjs(file.stat.mtime).fromNow()}</span>
-          <span class="size">${filesize(file.stat.size)}</span>
-        </a>
-      </li>`
-    );
+    let list = fileList.map(file => {
+      const isDir = file.stat && file.stat.isDirectory();
+      const size = !isDir
+        ? filesize(file.stat.size)
+        : '';
+      const date = file.stat && file.name !== '..'
+        ? dayjs(file.stat.mtime).fromNow()
+        : '';
+
+      return `
+        <li>
+          <a href="${file.name}" class="${getClassName(file)}">
+            <span class="name">${file.name}</span>
+            <span class="size">${size}</span>
+            <span class="date">${date}</span>
+          </a>
+        </li>
+      `
+    });
     list.unshift(
-      `<li class="header" style="width: 100%">
+      `<li class="header">
         <span class="name">Name</span>
         <span class="size">Size</span>
         <span class="date">Modified</span>
