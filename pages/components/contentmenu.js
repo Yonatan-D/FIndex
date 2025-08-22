@@ -1,4 +1,4 @@
-class FileList extends HTMLElement {
+class ContextMenu extends HTMLElement {
   constructor() {
     super();
     this.shadow = this.attachShadow({ mode: 'open' });
@@ -105,4 +105,4 @@ class FileList extends HTMLElement {
   
 }
 
-customElements.define('file-list', FileList);
+customElements.define('content-menu', ContextMenu);
