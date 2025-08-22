@@ -94,13 +94,13 @@ class ContextMenu extends HTMLElement {
   }
 
   connectedCallback() {
-    document.addEventListener('contextmenu', this.handleContextMenu.bind(this));
-    document.addEventListener('click', this.closeContextMenu.bind(this));
+    this.shadow.addEventListener('contextmenu', this.handleContextMenu.bind(this));
+    this.shadow.addEventListener('click', this.closeContextMenu.bind(this));
   }
 
   disconnectedCallback() {
-    document.removeEventListener('contextmenu', this.handleContextMenu.bind(this));
-    document.removeEventListener('click', this.closeContextMenu.bind(this));
+    this.shadow.removeEventListener('contextmenu', this.handleContextMenu.bind(this));
+    this.shadow.removeEventListener('click', this.closeContextMenu.bind(this));
   }
   
 }
