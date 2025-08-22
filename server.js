@@ -19,9 +19,7 @@ for (const node of config.NODE) {
   console.log(node.name + ': ' + node.path)
 }
 
-app.use('/web/components', express.static(path.resolve('./pages/components')))
-app.use('/web/js', express.static(path.resolve('./pages/js')))
-app.use('/web/css', express.static(path.resolve('./pages/css')))
+app.use('/public', express.static(path.resolve('./pages/public')))
 
 app.get('/', auth, home)
 
