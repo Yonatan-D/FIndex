@@ -5,7 +5,8 @@
   "type": "module",
   "scripts": {
     "dev": "nodemon server.js",
-    "start": "node server.js"
+    "start": "node server.js",
+    "pm2:start": "pm2 start app.json"
   },
   "keywords": [],
   "author": "yonatan <yonatan.lin@outlook.com>",

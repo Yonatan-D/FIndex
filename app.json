@@ -1,0 +1,8 @@
+{
+  "apps": {
+    "name": "FIndex",
+    "script": "node server.js",
+    "error_file": "logs/app-err.log",
+    "out_file": "logs/app-out.log"
+  }
+}
