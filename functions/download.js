@@ -13,16 +13,18 @@ export default async (req, res, next) => {
       reqPath.startsWith(`/${node.name}`)
     );
 
-    absolutePath = reqPath.replace(`/${node.name}`, node.path);
+    absolutePath = reqPath
+      .replace(`/${node.name}`, node.path)
+      .replace(/\/$/, "");
     console.log(
-      "[Download] Requested path: %s, Mapped to: %s",
+      "[Download Zip] Requested path: %s, Mapped to: %s",
       reqPath,
       absolutePath
     );
 
     if (fs.statSync(absolutePath).isFile()) return next();
 
-    console.log("[Download] Creating zip for directory: %s", absolutePath);
+    console.log("[Download Zip] Creating zip for directory: %s", absolutePath);
     zipPath = `${absolutePath}.zip`;
     const archive = fs.createWriteStream(zipPath);
     const zip = archiver("zip", { zlib: { level: 9 } });
@@ -36,17 +38,17 @@ export default async (req, res, next) => {
     zip.finalize();
 
     archive.on("close", () => {
-      console.log("[Download] Zip created successfully: %s", zipPath);
+      console.log("[Download Zip] Zip created successfully: %s", zipPath);
       res.download(zipPath, (err) => {
         if (err) throw err;
-        console.log("[Download] File sent successfully: %s", zipPath);
+        console.log("[Download Zip] File sent successfully: %s", zipPath);
         // 成功后也清理临时文件
         try {
           fs.unlinkSync(zipPath);
-          console.log("[Download] Cleaned up temporary file: %s", zipPath);
+          console.log("[Download Zip] Cleaned up temporary file: %s", zipPath);
         } catch (cleanupErr) {
           console.error(
-            "[Download] Failed to clean up temporary file: %s",
+            "[Download Zip] Failed to clean up temporary file: %s",
             zipPath,
             cleanupErr
           );
@@ -54,15 +56,15 @@ export default async (req, res, next) => {
       });
     });
   } catch (err) {
-    console.error("[Download] Error processing %s:", absolutePath, err);
+    console.error("[Download Zip] Error processing %s:", absolutePath, err);
     // 统一清理临时文件
     if (zipPath && fs.existsSync(zipPath)) {
       try {
         fs.unlinkSync(zipPath);
-        console.log("[Download] Cleaned up temporary file: %s", zipPath);
+        console.log("[Download Zip] Cleaned up temporary file: %s", zipPath);
       } catch (cleanupErr) {
         console.error(
-          "[Download] Failed to clean up temporary file: %s",
+          "[Download Zip] Failed to clean up temporary file: %s",
           zipPath,
           cleanupErr
         );

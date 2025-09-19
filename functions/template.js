@@ -224,6 +224,9 @@ export default async (locals, callback) => {
   const generateFileList = (fileList) => {
     let list = fileList.map(file => {
       const isDir = file.stat && file.stat.isDirectory();
+      const url = isDir
+        ? file.name + '/'
+        : file.name;
       const size = !isDir
         ? filesize(file.stat.size)
         : '';
@@ -233,7 +236,7 @@ export default async (locals, callback) => {
 
       return `
         <li>
-          <a href="${file.name}" class="${getClassName(file)}">
+          <a href="${url}" class="${getClassName(file)}">
             <span class="name">${file.name}</span>
             <span class="size">${size}</span>
             <span class="date">${date}</span>
