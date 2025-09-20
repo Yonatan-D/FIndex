@@ -16,11 +16,11 @@ export default async (req, res, next) => {
     absolutePath = reqPath
       .replace(`/${node.name}`, node.path)
       .replace(/\/$/, "");
-    console.log(
-      "[Download Zip] Requested path: %s, Mapped to: %s",
-      reqPath,
-      absolutePath
-    );
+    // console.log(
+    //   "[Download] Requested path: %s, Mapped to: %s",
+    //   reqPath,
+    //   absolutePath
+    // );
 
     if (fs.statSync(absolutePath).isFile()) return next();
 
