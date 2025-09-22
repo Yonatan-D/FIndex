@@ -52,6 +52,7 @@ class ContextMenu extends HTMLElement {
   }
 
   handleContextMenu(event) {
+    event.preventDefault();
     const link = event.target.closest('a');
     if (!link) {
       this.closeContextMenu();
@@ -59,7 +60,6 @@ class ContextMenu extends HTMLElement {
     }
     if (link?.firstElementChild?.textContent === '..')
       return;
-    event.preventDefault();
     const { pageX, pageY } = event;
     Object.assign(this.contextMenu.style, {
       display: 'block',
@@ -71,6 +71,12 @@ class ContextMenu extends HTMLElement {
 
   closeContextMenu() {
     this.contextMenu.style.display = 'none';
+  }
+
+  closeContextMenuOnClickOutside(event) {
+    if (!this.contains(event.target)) {
+      this.closeContextMenu();
+    }
   }
 
   handleMenuItemClick(type) {
@@ -96,11 +102,15 @@ class ContextMenu extends HTMLElement {
   connectedCallback() {
     this.shadow.addEventListener('contextmenu', this.handleContextMenu.bind(this));
     this.shadow.addEventListener('click', this.closeContextMenu.bind(this));
+    document.addEventListener('contextmenu', this.closeContextMenuOnClickOutside.bind(this));
+    document.addEventListener('click', this.closeContextMenuOnClickOutside.bind(this));
   }
 
   disconnectedCallback() {
     this.shadow.removeEventListener('contextmenu', this.handleContextMenu.bind(this));
     this.shadow.removeEventListener('click', this.closeContextMenu.bind(this));
+    document.removeEventListener('contextmenu', this.closeContextMenuOnClickOutside.bind(this));
+    document.removeEventListener('click', this.closeContextMenuOnClickOutside.bind(this));
   }
   
 }
