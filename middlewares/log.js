@@ -18,7 +18,7 @@ export default async (req, res, next) => {
     const httpStatus = res.statusCode;
 
     if (!isFiltered) {
-      console.log(`[${time}] ${req.ip} | ${req.method} ${decodeURIComponent(req.originalUrl)} ${httpStatus} - ${duration}ms | checkAuth:${authStatus.message}`);
+      console.log(`${req.ip} -- [${time}] "${req.method} ${decodeURIComponent(req.originalUrl)}" ${httpStatus} - ${duration}ms | checkAuth:${authStatus.message}`);
     }
   });
 
