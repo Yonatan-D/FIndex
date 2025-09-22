@@ -2,6 +2,21 @@ import dayjs from "dayjs";
 import config from "../config.js";
 import { checkAuth } from "./auth.js";
 
+export const logger = (req) => {
+  const date = dayjs().format("YYYY-MM-DD HH:mm:ss");
+
+  return {
+    info: (...args) => {
+      const arg0 = args.shift();
+      console.log(`${req.ip} -- [${date}] | INFO | ${arg0}`, ...args);
+    },
+    error: (...args) => {
+      const arg0 = args.shift();
+      console.error(`${req.ip} -- [${date}] | ERROR | ${arg0}}`, ...args);
+    },
+  }
+}
+
 export default async (req, res, next) => {
   const filterRules = [
     '/favicon.ico',
