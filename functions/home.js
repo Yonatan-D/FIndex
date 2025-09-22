@@ -8,7 +8,7 @@ const generateLinks = () => {
   return config.NODE.map((node) => {
     return `
           <li>
-            <a href="/${node.name}" class="icon icon-directory" title="test-nvim">
+            <a href="/${node.name}/" class="icon icon-directory" title="test-nvim">
               <span class="name">📁 ${node.name}</span>
             </a>
           </li>

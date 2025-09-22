@@ -11,7 +11,7 @@ export default {
     }
   ],
   // IP白名单
-  WHITE_IP: [
+  IP_WHITE_LIST: [
     '127.0.0.1',
     'localhost',
   ],

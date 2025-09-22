@@ -1,13 +1,30 @@
 import config from "../config.js";
 
+export const checkAuth = (req) => {
+  const allowHost = config.IP_WHITE_LIST.includes(req.hostname);
+  const allowToken = config.TOKEN && (req.query?.token === config.TOKEN || req.headers.cookie?.includes(`x-token=${config.TOKEN}`));
+  if (allowHost) {
+    return {
+      status: true,
+      message: "whitelist",
+    };
+  }
+  if (allowToken) {
+    return {
+      status: true,
+      message: "token",
+    }
+  }
+  return {
+    status: false,
+    message: "无权限访问"
+  };
+}
+
 export default async (req, res, next) => {
-  if (
-    config.WHITE_IP.includes(req.hostname) ||
-    (config.TOKEN &&
-      (req.query?.token === config.TOKEN ||
-        req.headers.cookie?.includes(`x-token=${config.TOKEN}`)))
-  ) {
+  const auth = checkAuth(req);
+  if (auth.status) {
     return next();
   }
-  res.status(401).send("无权限访问");
+  res.status(401).send(auth.message);
 };
