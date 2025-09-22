@@ -20,6 +20,10 @@ export default async (req, res, next) => {
   if (req.query.download === undefined) return next();
 
   const log = logger(req);
+  const handleCleanup = () => {
+    const [level, message] = cleanUpTempFile(zipPath);
+    log[level](...message);
+  };
   
   let absolutePath = "";
   let zipPath = "";
@@ -56,25 +60,21 @@ export default async (req, res, next) => {
     archive.on("close", () => {
       log.info("[Download Zip] Zip created successfully: %s", zipPath);
       res.download(zipPath, (err) => {
-        try {
-          if (err) throw err;
-          log.info("[Download Zip] File sent successfully: %s", zipPath);
-          const [level, message] = cleanUpTempFile(zipPath);
-          log[level](...message);
-        } catch (err) {
+        if (err) {
           log.error("[Download Zip] Error sending file: %s", zipPath, err);
-          const [level, message] = cleanUpTempFile(zipPath);
-          log[level](...message);
-          res.status(500).send("处理失败");
+          handleCleanup();
+          return res.status(500).send("处理失败");
         }
+
+        log.info("[Download Zip] File sent successfully: %s", zipPath);
+        handleCleanup();
       });
     });
   } catch (err) {
     log.error("[Download Zip] Error processing %s:", absolutePath, err);
     // 统一清理临时文件
     if (zipPath && fs.existsSync(zipPath)) {
-      const [level, message] = cleanUpTempFile(zipPath);
-      log[level](...message);
+      handleCleanup();
     }
     res.status(500).send("处理失败");
   }
