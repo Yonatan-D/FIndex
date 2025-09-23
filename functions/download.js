@@ -21,6 +21,7 @@ const getAbsolutePath = (url) => {
 
 const createZipFile = (sourceDir) => {
   return new Promise((resolve, reject) => {
+    const startTime = Date.now();
     const fileName = sourceDir.split('/').pop() + '.zip';
     log.info(`[Download] "%s" Downloading directory: %s, Creating zip file...`, fileName, sourceDir);
 
@@ -40,8 +41,9 @@ const createZipFile = (sourceDir) => {
     zip.finalize();
 
     archive.on("close", () => {
+      const durationTime = Date.now() - startTime;
       const stats = fs.statSync(outPath);
-      log.info(`[Download] "%s" Created successfully. OutPath: %s, Size: %s`, fileName, outPath, filesize(stats.size));
+      log.info(`[Download] "%s" Created successfully. OutPath: %s, Size: %s, DurationTime: %d ms`, fileName, outPath, filesize(stats.size), durationTime);
       resolve(outPath);
     });
   });
