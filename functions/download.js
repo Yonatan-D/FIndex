@@ -15,7 +15,7 @@ const getAbsolutePath = (url) => {
     .replace(`/${node.name}`, node.path)
     .replace(/\/$/, "");
   const fileName = absolutePath.split('/').pop() + '.zip';
-  log.info(`[Download] "%s" Requested path: %s, Mapped to: %s`, fileName, urlWithoutParams, absolutePath);
+  log.info(`[Download] "%s" Requested path: "%s", Mapped to: "%s"`, fileName, urlWithoutParams, absolutePath);
   return absolutePath;
 }
 
@@ -23,7 +23,7 @@ const createZipFile = (sourceDir) => {
   return new Promise((resolve, reject) => {
     const startTime = Date.now();
     const fileName = sourceDir.split('/').pop() + '.zip';
-    log.info(`[Download] "%s" Downloading directory: %s, Creating zip file...`, fileName, sourceDir);
+    log.info(`[Download] "%s" Downloading directory: "%s", Creating zip file...`, fileName, sourceDir);
 
     const tempDir = `/tmp/FIndex/${dayjs().format('YYYYMMDD')}/`;
     fs.mkdirSync(tempDir, { recursive: true });
@@ -43,7 +43,7 @@ const createZipFile = (sourceDir) => {
     archive.on("close", () => {
       const durationTime = Date.now() - startTime;
       const stats = fs.statSync(outPath);
-      log.info(`[Download] "%s" Created successfully. OutPath: %s, Size: %s, DurationTime: %d ms`, fileName, outPath, filesize(stats.size), durationTime);
+      log.info(`[Download] "%s" Created successfully. OutPath: "%s", Size: %s, DurationTime: %d ms`, fileName, outPath, filesize(stats.size), durationTime);
       resolve(outPath);
     });
   });
@@ -79,7 +79,7 @@ export default async (req, res, next) => {
         return res.status(500).send("处理失败");
       }
 
-      log.info(`[Download] "%s" Successfully sent file`, fileName, tempZipFilePath);
+      log.info(`[Download] "%s" Successfully sent file`, fileName);
       cleanUpZipFile(tempZipFilePath);
     });
   } catch (err) {
