@@ -6,7 +6,7 @@ const loadEnv = () => {
       const value = fn();
       if (Array.isArray(value)) {
         env[key] = value.filter(item => item);
-      } else if (isNaN(value)) {
+      } else if (Number.isNaN(value)) {
         env[key] = defaultValue;
       } else {
         env[key] = value;
