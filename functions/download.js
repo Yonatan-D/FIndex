@@ -5,10 +5,11 @@ import { logger } from "../middlewares/log.js";
 import dayjs from "dayjs";
 import { filesize } from 'filesize';
 const log = logger();
+const { BUCKETS } = config;
 
 const getAbsolutePath = (url) => {
   const urlWithoutParams = decodeURIComponent(url).split("?")[0];
-  const node = config.BUCKETS.find(node => urlWithoutParams.startsWith(`/${node.name}`));
+  const node = BUCKETS.find(node => urlWithoutParams.startsWith(`/${node.name}`));
   const absolutePath = urlWithoutParams
     .replace(`/${node.name}`, node.path)
     .replace(/\/$/, "");

@@ -8,13 +8,14 @@ import log from './middlewares/log.js';
 import download from './functions/download.js';
 import home from './functions/home.js';
 import template from './functions/template.js';
+const { BUCKETS, PORT } = config;
 
 const app = express();
 app.use(log);
 
 console.log('Loading buckets:');
 
-for (const node of config.BUCKETS) {
+for (const node of BUCKETS) {
   app.use(`/${node.name}`, auth, download, express.static(node.path), serveIndex(node.path, {
     icons: true,
     view: 'details',
@@ -28,6 +29,6 @@ app.use('/public', express.static(path.resolve('./pages/public')));
 
 app.get('/', auth, home);
 
-app.listen(config.PORT, '0.0.0.0', () => {
-  console.log(`Starting at http://localhost:${config.PORT}`);
+app.listen(PORT, '0.0.0.0', () => {
+  console.log(`Starting at http://localhost:${PORT}`);
 });

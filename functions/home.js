@@ -3,9 +3,10 @@ import path from 'path';
 import { Transform } from 'stream';
 import { pipeline } from 'stream/promises';
 import config from '../config.js';
+const { BUCKETS } = config;
 
 const generateLinks = () => {
-  return config.BUCKETS.map((node) => {
+  return BUCKETS.map((node) => {
     return `
       <li>
         <a href="/${node.name}/" class="icon icon-directory" title="test-nvim">

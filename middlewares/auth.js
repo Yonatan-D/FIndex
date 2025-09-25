@@ -1,9 +1,10 @@
 import config from "../config.js";
+const { IP_WHITE_LIST, TOKEN } = config;
 
 export const checkAuth = (req) => {
-  const allowHost = config.IP_WHITE_LIST.includes(req.hostname);
-  const allowToken = req.query?.token === config.TOKEN || req.headers.cookie?.includes(`x-token=${config.TOKEN}`);
-  if (!config.TOKEN) {
+  const allowHost = IP_WHITE_LIST.includes(req.hostname);
+  const allowToken = req.query?.token === TOKEN || req.headers.cookie?.includes(`x-token=${TOKEN}`);
+  if (!TOKEN) {
     return {
       status: true,
       message: "no-token-set",
