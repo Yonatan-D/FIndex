@@ -12,6 +12,8 @@ import template from './functions/template.js';
 const app = express();
 app.use(log);
 
+console.log('Loading buckets:');
+
 for (const node of config.NODE) {
   app.use(`/${node.name}`, auth, download, express.static(node.path), serveIndex(node.path, {
     icons: true,

@@ -33,6 +33,6 @@ const defaultConfig = {
 
 const mergedConfig = Object.assign({}, defaultConfig, loadEnv());
 
-console.log(mergedConfig);
+console.log('Config:', mergedConfig);
 
 export default mergedConfig;
