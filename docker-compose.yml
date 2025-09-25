@@ -1,0 +1,14 @@
+version: '3'
+services:
+  findex:
+    build: .
+    image: findex
+    restart: unless-stopped
+    container_name: findex
+    ports:
+      - 3000:3000
+    volumes:
+      - /home/yonatan/test:/home/yonatan/test
+      - /home/yonatan/pkg:/home/yonatan/pkg
+    env_file: .env
+

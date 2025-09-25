@@ -4,10 +4,13 @@
   "main": "server.js",
   "type": "module",
   "scripts": {
-    "build": "docker build -t findex .",
+    "build": "docker-compose build",
     "dev": "nodemon server.js",
     "start": "node server.js",
-    "pm2:start": "pm2 start app.json"
+    "pm2:start": "pm2 start app.json",
+    "docker:start": "docker-compose up -d",
+    "docker:stop": "docker-compose down",
+    "docker:restart": "npm run docker:stop && npm run docker:start"
   },
   "keywords": [],
   "author": "yonatan <yonatan.lin@outlook.com>",
