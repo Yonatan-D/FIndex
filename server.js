@@ -1,6 +1,7 @@
 import express from 'express';
 import serveIndex from 'serve-index';
 import path from 'path';
+import 'dotenv/config';
 import config from './config.js';
 import auth from './middlewares/auth.js';
 import log from './middlewares/log.js';
