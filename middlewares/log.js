@@ -15,8 +15,8 @@ export const logger = () => {
       const arg0 = args.shift();
       console.error(`${_req.ip} -- [${date}] | ERROR | ${arg0}}`, ...args);
     },
-  }
-}
+  };
+};
 
 export default async (req, res, next) => {
   _req = req;

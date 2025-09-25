@@ -3,21 +3,19 @@ import archiver from "archiver";
 import config from "../config.js";
 import { logger } from "../middlewares/log.js";
 import dayjs from "dayjs";
-import { filesize } from 'filesize'
+import { filesize } from 'filesize';
 const log = logger();
 
 const getAbsolutePath = (url) => {
   const urlWithoutParams = decodeURIComponent(url).split("?")[0];
-  const node = config.NODE.find((node) =>
-    urlWithoutParams.startsWith(`/${node.name}`)
-  );
+  const node = config.NODE.find(node => urlWithoutParams.startsWith(`/${node.name}`));
   const absolutePath = urlWithoutParams
     .replace(`/${node.name}`, node.path)
     .replace(/\/$/, "");
   const fileName = absolutePath.split('/').pop() + '.zip';
   log.info(`[Download] "%s" Requested path: "%s", Mapped to: "%s"`, fileName, urlWithoutParams, absolutePath);
   return absolutePath;
-}
+};
 
 const createZipFile = (sourceDir) => {
   return new Promise((resolve, reject) => {
@@ -57,7 +55,7 @@ const cleanUpZipFile = (tempFilePath) => {
   } catch (error) {
     log.error(`[Download] "%s" Failed to clean up temporary file:\n %s`, fileName, error);
   }
-}
+};
 
 export default async (req, res, next) => {
   if (req.query.download === undefined) return next();

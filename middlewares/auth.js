@@ -13,13 +13,13 @@ export const checkAuth = (req) => {
     return {
       status: true,
       message: "token",
-    }
+    };
   }
   return {
     status: false,
     message: "无权限访问"
   };
-}
+};
 
 export default async (req, res, next) => {
   const auth = checkAuth(req);

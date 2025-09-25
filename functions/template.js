@@ -1,13 +1,13 @@
-import fs from 'fs'
-import path from 'path'
-import { filesize } from 'filesize'
-import dayjs from 'dayjs'
-import mime from 'mime-types'
-import 'dayjs/locale/zh-cn.js'
-import relativeTime from 'dayjs/plugin/relativeTime.js'
+import fs from 'fs';
+import path from 'path';
+import { filesize } from 'filesize';
+import dayjs from 'dayjs';
+import mime from 'mime-types';
+import 'dayjs/locale/zh-cn.js';
+import relativeTime from 'dayjs/plugin/relativeTime.js';
 
-dayjs.locale('zh-cn')
-dayjs.extend(relativeTime)
+dayjs.locale('zh-cn');
+dayjs.extend(relativeTime);
 
 const icons = {
   // base icons
@@ -120,37 +120,37 @@ const icons = {
   '.yaws': 'page_white_code.png'
 };
 
-const cache = {}
+const cache = {};
 
 export default async (locals, callback) => {
   const load = (icon) => {
     if (cache[icon]) return cache[icon];
     return cache[icon] = fs.readFileSync(path.resolve(`./pages/icons/${icon}`), 'base64');
-  }
+  };
 
   const getStyle = (fileList) => {
     const rules = {};
     fileList.forEach(file => {
       const icon = getIcon(file.name);
-      if (!rules[icon.className]){
+      if (!rules[icon.className]) {
         rules[icon.className] = {
           selector: `#files .${icon.className} .name`,
           content: `background-image: url(data:image/png;base64,${load(icon.fileName)});`,
-        }
+        };
       }
-    })
+    });
     rules['icon-directory'] = {
       selector: '#files .icon-directory .name',
       content: `background-image: url(data:image/png;base64,${load(icons.folder)});`,
-    }
+    };
     const style = [];
     for (const iconName in rules) {
       style.push(`${rules[iconName].selector} {\n  ${rules[iconName].content}\n}`);
     }
     return style.join('\n');
-  }
+  };
 
-  function getIcon(filename) {
+  const getIcon = (filename) => {
     const ext = path.extname(filename);
   
     // try by extension
@@ -202,7 +202,7 @@ export default async (locals, callback) => {
       className: 'icon-default',
       fileName: icons.default
     };
-  }
+  };
 
   const getClassName = (file) => {
     const classes = [];
@@ -213,13 +213,13 @@ export default async (locals, callback) => {
       if (isDir) {
         classes.push('icon-directory');
       } else {
-        const icon = getIcon(file.name)
+        const icon = getIcon(file.name);
         classes.push(icon.className);
       }
     }
 
     return classes.join(' ');
-  }
+  };
 
   const generateFileList = (fileList) => {
     let list = fileList.map(file => {
@@ -253,7 +253,7 @@ export default async (locals, callback) => {
     );
     list = `<ul id="files" class="view-${locals.viewName}">${list.join('')}</ul>`;
     return list;
-  }
+  };
 
   let renderContent = fs.readFileSync(path.resolve("./pages/directory.html"), 'utf-8');
   renderContent = renderContent.replace("{linked-path}", locals.directory);
@@ -261,4 +261,4 @@ export default async (locals, callback) => {
   renderContent = renderContent.replace("{style}", getStyle(locals.fileList));
 
   callback(null, renderContent);
-}
+};

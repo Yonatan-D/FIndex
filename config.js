@@ -16,4 +16,4 @@ export default {
     'localhost',
   ],
   TOKEN: 'ydev2025'
-}
+};
