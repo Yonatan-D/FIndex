@@ -5,7 +5,7 @@ import { pipeline } from 'stream/promises';
 import config from '../config.js';
 
 const generateLinks = () => {
-  return config.NODE.map((node) => {
+  return config.BUCKETS.map((node) => {
     return `
       <li>
         <a href="/${node.name}/" class="icon icon-directory" title="test-nvim">

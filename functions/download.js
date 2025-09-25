@@ -8,7 +8,7 @@ const log = logger();
 
 const getAbsolutePath = (url) => {
   const urlWithoutParams = decodeURIComponent(url).split("?")[0];
-  const node = config.NODE.find(node => urlWithoutParams.startsWith(`/${node.name}`));
+  const node = config.BUCKETS.find(node => urlWithoutParams.startsWith(`/${node.name}`));
   const absolutePath = urlWithoutParams
     .replace(`/${node.name}`, node.path)
     .replace(/\/$/, "");

@@ -14,7 +14,7 @@ app.use(log);
 
 console.log('Loading buckets:');
 
-for (const node of config.NODE) {
+for (const node of config.BUCKETS) {
   app.use(`/${node.name}`, auth, download, express.static(node.path), serveIndex(node.path, {
     icons: true,
     view: 'details',
