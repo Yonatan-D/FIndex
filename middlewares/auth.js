@@ -2,11 +2,17 @@ import config from "../config.js";
 
 export const checkAuth = (req) => {
   const allowHost = config.IP_WHITE_LIST.includes(req.hostname);
-  const allowToken = config.TOKEN && (req.query?.token === config.TOKEN || req.headers.cookie?.includes(`x-token=${config.TOKEN}`));
+  const allowToken = req.query?.token === config.TOKEN || req.headers.cookie?.includes(`x-token=${config.TOKEN}`);
   if (allowHost) {
     return {
       status: true,
       message: "whitelist",
+    };
+  }
+  if (!config.TOKEN) {
+    return {
+      status: true,
+      message: "no-token-set",
     };
   }
   if (allowToken) {
