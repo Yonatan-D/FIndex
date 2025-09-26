@@ -5,10 +5,10 @@ services:
     image: findex
     restart: unless-stopped
     container_name: findex
+    working_dir: /data
     ports:
       - 3000:3000
     volumes:
-      - /home/yonatan/test:/home/yonatan/test
-      - /home/yonatan/pkg:/home/yonatan/pkg
-    env_file: .env
-
+      - /home/yonatan/test:/data/node1:ro
+      - /home/yonatan/pkg:/data/node2:ro
+    env_file: .env.docker
