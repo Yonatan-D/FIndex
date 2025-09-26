@@ -13,7 +13,9 @@ const loadEnv = () => {
   const safeExecute = (key, fn, defaultValue) => {
     try {
       const value = fn();
-      if (Array.isArray(value)) {
+      if (value === undefined) {
+        env[key] = defaultValue;
+      } else if (Array.isArray(value)) {
         env[key] = value.filter(item => item);
       } else if (Number.isNaN(value)) {
         env[key] = defaultValue;
@@ -29,8 +31,8 @@ const loadEnv = () => {
   // 读取环境变量
   safeExecute('PORT', () => parseInt(process.env.PORT), 3000);
   safeExecute('TITLE', () => process.env.TITLE, 'FIndex');
-  safeExecute('BUCKETS', () => JSON.parse(process.env.BUCKETS), []);
-  safeExecute('IP_WHITE_LIST', () => process.env.IP_WHITE_LIST.split(','), []);
+  safeExecute('BUCKETS', () => JSON.parse(process.env.BUCKETS || '[]'), []);
+  safeExecute('IP_WHITE_LIST', () => process.env.IP_WHITE_LIST?.split(','), []);
   safeExecute('TOKEN', () => process.env.TOKEN, undefined);
 
   return env;
