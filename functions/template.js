@@ -5,6 +5,8 @@ import dayjs from 'dayjs';
 import mime from 'mime-types';
 import 'dayjs/locale/zh-cn.js';
 import relativeTime from 'dayjs/plugin/relativeTime.js';
+import config from '../config.js';
+const { APP_ROOT } = config;
 
 dayjs.locale('zh-cn');
 dayjs.extend(relativeTime);
@@ -125,7 +127,7 @@ const cache = {};
 export default async (locals, callback) => {
   const load = (icon) => {
     if (cache[icon]) return cache[icon];
-    return cache[icon] = fs.readFileSync(path.resolve(`./pages/icons/${icon}`), 'base64');
+    return cache[icon] = fs.readFileSync(path.resolve(APP_ROOT, `./pages/icons/${icon}`), 'base64');
   };
 
   const getStyle = (fileList) => {
@@ -255,7 +257,7 @@ export default async (locals, callback) => {
     return list;
   };
 
-  let renderContent = fs.readFileSync(path.resolve("./pages/directory.html"), 'utf-8');
+  let renderContent = fs.readFileSync(path.resolve(APP_ROOT, "./pages/directory.html"), 'utf-8');
   renderContent = renderContent.replace("{linked-path}", locals.directory);
   renderContent = renderContent.replace("{files}", generateFileList(locals.fileList));
   renderContent = renderContent.replace("{style}", getStyle(locals.fileList));

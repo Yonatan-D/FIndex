@@ -3,7 +3,7 @@ import path from 'path';
 import { Transform } from 'stream';
 import { pipeline } from 'stream/promises';
 import config from '../config.js';
-const { BUCKETS } = config;
+const { APP_ROOT, BUCKETS } = config;
 
 const generateLinks = () => {
   return BUCKETS.map((node) => {
@@ -31,7 +31,7 @@ export default async (req, res, next) => {
     });
 
     await pipeline(
-      fs.createReadStream(path.resolve("./pages/index.html")),
+      fs.createReadStream(path.resolve(APP_ROOT, "./pages/index.html")),
       replaceStream,
       res
     );

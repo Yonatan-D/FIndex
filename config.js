@@ -1,3 +1,12 @@
+import { fileURLToPath } from "url";
+import { dirname } from "path";
+
+const getAppRoot = () => {
+  const __filename = fileURLToPath(import.meta.url);
+  const __dirname = dirname(__filename);
+  return __dirname;
+}
+
 const loadEnv = () => {
   const env = {};
   // 传入配置项、处理函数和错误时的默认值，如果处理函数抛出错误，则返回默认值
@@ -27,6 +36,7 @@ const loadEnv = () => {
 }
 
 const defaultConfig = {
+  APP_ROOT: getAppRoot(),
   PORT: 3000,
   BUCKETS: [],
   IP_WHITE_LIST: [],
