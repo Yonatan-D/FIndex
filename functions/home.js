@@ -23,8 +23,8 @@ export default async (req, res, next) => {
     const replaceStream = new Transform({
       transform(chunk, encoding, callback) {
         const templateContent = chunk.toString();
-        // 替换 <!-- links --> 为动态生成的链接列表
-        const renderContent = templateContent.replace("<!-- links -->", generateLinks());
+        // 替换 {links} 为动态生成的链接列表
+        const renderContent = templateContent.replace("{links}", generateLinks());
         this.push(renderContent);
         callback();
       },
