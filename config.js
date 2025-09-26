@@ -28,6 +28,7 @@ const loadEnv = () => {
   }
   // 读取环境变量
   safeExecute('PORT', () => parseInt(process.env.PORT), 3000);
+  safeExecute('TITLE', () => process.env.TITLE, 'FIndex');
   safeExecute('BUCKETS', () => JSON.parse(process.env.BUCKETS), []);
   safeExecute('IP_WHITE_LIST', () => process.env.IP_WHITE_LIST.split(','), []);
   safeExecute('TOKEN', () => process.env.TOKEN, undefined);
