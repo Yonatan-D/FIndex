@@ -38,6 +38,7 @@ const loadEnv = () => {
 const defaultConfig = {
   APP_ROOT: getAppRoot(),
   PORT: 3000,
+  TITLE: 'FIndex',
   BUCKETS: [],
   IP_WHITE_LIST: [],
   TOKEN: undefined,

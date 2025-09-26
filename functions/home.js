@@ -3,7 +3,11 @@ import path from 'path';
 import { Transform } from 'stream';
 import { pipeline } from 'stream/promises';
 import config from '../config.js';
-const { APP_ROOT, BUCKETS } = config;
+const { APP_ROOT, TITLE, BUCKETS } = config;
+
+const getTitle = () => {
+  return `Home | ${TITLE}`;
+}
 
 const generateLinks = () => {
   return BUCKETS.map((node) => {
@@ -22,9 +26,15 @@ export default async (req, res, next) => {
     // 创建一个转换流用于替换模板中的占位符
     const replaceStream = new Transform({
       transform(chunk, encoding, callback) {
-        const templateContent = chunk.toString();
-        // 替换 {links} 为动态生成的链接列表
-        const renderContent = templateContent.replace("{links}", generateLinks());
+        const templateContent = chunk.toString('utf8');
+        const replacements = {
+          "{title}": getTitle(),
+          "{links}": generateLinks(),
+        };
+        let renderContent = templateContent;
+        for (const [key, value] of Object.entries(replacements)) {
+          renderContent = renderContent.replace(key, value);
+        }
         this.push(renderContent);
         callback();
       },
