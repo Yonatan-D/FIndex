@@ -8,7 +8,7 @@ import relativeTime from 'dayjs/plugin/relativeTime.js';
 import config from '../config.js';
 const { APP_ROOT, TITLE } = config;
 
-dayjs.locale('zh-cn');
+// dayjs.locale('zh-cn');
 dayjs.extend(relativeTime);
 
 const icons = {
@@ -241,7 +241,7 @@ export default async (locals, callback) => {
           <a href="${url}" class="${getClassName(file)}">
             <span class="name">${file.name}</span>
             <span class="size">${size}</span>
-            <span class="date">${date}</span>
+            <span class="date" title="${dayjs(file.stat.mtime).format('YYYY-MM-DD HH:mm:ss')}">${date}</span>
           </a>
         </li>
       `
