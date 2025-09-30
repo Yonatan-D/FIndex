@@ -16,7 +16,8 @@ app.use(log);
 console.log('Loading buckets:');
 
 for (const node of BUCKETS) {
-  app.use(`/${node.name}`, auth, download, express.static(node.path), serveIndex(node.path, {
+  const routePath = '/' + encodeURIComponent(node.name);
+  app.use(routePath, auth, download, express.static(node.path), serveIndex(node.path, {
     icons: true,
     view: 'details',
     // template: path.resolve(APP_ROOT, './pages/directory.html')
