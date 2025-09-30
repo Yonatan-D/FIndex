@@ -233,6 +233,9 @@ export default async (locals, callback) => {
         ? filesize(file.stat.size)
         : '';
       const date = file.stat && file.name !== '..'
+        ? dayjs(file.stat.mtime).format('YYYY-MM-DD HH:mm:ss')
+        : '';
+      const fromNowDate = file.stat && file.name !== '..'
         ? dayjs(file.stat.mtime).fromNow()
         : '';
 
@@ -241,7 +244,7 @@ export default async (locals, callback) => {
           <a href="${url}" class="${getClassName(file)}">
             <span class="name">${file.name}</span>
             <span class="size">${size}</span>
-            <span class="date" title="${dayjs(file.stat.mtime).format('YYYY-MM-DD HH:mm:ss')}">${date}</span>
+            <span class="date" title="${date}">${fromNowDate}</span>
           </a>
         </li>
       `
