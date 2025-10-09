@@ -1,3 +1,4 @@
+import c from 'kleur';
 import express from 'express';
 import serveIndex from 'serve-index';
 import path from 'path';
@@ -13,7 +14,7 @@ const { APP_ROOT, BUCKETS, PORT } = config;
 const app = express();
 app.use(log);
 
-console.log('Loading buckets:');
+console.log(c.yellow('Loading buckets:'));
 
 for (const node of BUCKETS) {
   const routePath = '/' + encodeURIComponent(node.name);
@@ -23,7 +24,7 @@ for (const node of BUCKETS) {
     // template: path.resolve(APP_ROOT, './pages/directory.html')
     template,
   }));
-  console.log(node.name + ': ' + node.path);
+  console.log(c.yellow(node.name + ': ' + node.path));
 }
 
 app.use('/public', express.static(path.resolve(APP_ROOT, './pages/public')));
@@ -31,5 +32,5 @@ app.use('/public', express.static(path.resolve(APP_ROOT, './pages/public')));
 app.get('/', auth, home);
 
 app.listen(PORT, '0.0.0.0', () => {
-  console.log(`Starting at http://localhost:${PORT}`);
+  console.log(c.green(`Starting at http://localhost:${PORT}`));
 });

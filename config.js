@@ -1,3 +1,4 @@
+import c from 'kleur';
 import { fileURLToPath } from "url";
 import { dirname } from "path";
 
@@ -49,6 +50,6 @@ const defaultConfig = {
 
 const mergedConfig = Object.assign({}, defaultConfig, loadEnv());
 
-console.log('Config:', mergedConfig);
+console.log(c.yellow('Config:'), mergedConfig);
 
 export default mergedConfig;
