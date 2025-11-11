@@ -2,54 +2,64 @@ import c from 'kleur';
 import { fileURLToPath } from "url";
 import { dirname } from "path";
 
+// 获取应用根目录
 const getAppRoot = () => {
   const __filename = fileURLToPath(import.meta.url);
-  const __dirname = dirname(__filename);
-  return __dirname;
+  return dirname(__filename);
 }
 
-const loadEnv = () => {
-  const env = {};
-  // 传入配置项、处理函数和错误时的默认值，如果处理函数抛出错误，则返回默认值
-  const safeExecute = (key, fn, defaultValue) => {
-    try {
-      const value = fn();
-      if (value === undefined) {
-        env[key] = defaultValue;
-      } else if (Array.isArray(value)) {
-        env[key] = value.filter(item => item);
-      } else if (Number.isNaN(value)) {
-        env[key] = defaultValue;
-      } else {
-        env[key] = value;
-      }
-    } catch (error) {
-      const errorLine = error.stack.split('\n')[2]; // 获取错误行号
-      console.error(`Error reading environment variable "${key}": ${error}`, errorLine);
-      env[key] =  defaultValue;
-    }
-  }
-  // 读取环境变量
-  safeExecute('PORT', () => parseInt(process.env.PORT), 3000);
-  safeExecute('TITLE', () => process.env.TITLE, 'FIndex');
-  safeExecute('BUCKETS', () => JSON.parse(process.env.BUCKETS || '[]'), []);
-  safeExecute('IP_WHITE_LIST', () => process.env.IP_WHITE_LIST?.split(','), []);
-  safeExecute('TOKEN', () => process.env.TOKEN, undefined);
+// 环境变量类型定义
+const ENV_TYPES = {
+  PORT: 'number',
+  TITLE: 'string',
+  BUCKETS: 'array',
+  IP_WHITE_LIST: 'array',
+  TOKEN: 'string',
+}; 
 
-  return env;
-}
-
-const defaultConfig = {
+// 默认配置
+const DEFAULT_CONFIG = {
   APP_ROOT: getAppRoot(),
   PORT: 3000,
   TITLE: 'FIndex',
   BUCKETS: [],
   IP_WHITE_LIST: [],
   TOKEN: undefined,
+};
+
+// 环境变量转换器
+const ENV_TRANSFORMERS = {
+  PORT: (value) => parseInt(value),
+  BUCKETS: (value) => JSON.parse(value || '[]'),
+  IP_WHITE_LIST: (value) => value.split(',').map(i => i.trim()).filter(Boolean),
 }
 
-const mergedConfig = Object.assign({}, defaultConfig, loadEnv());
+// 加载环境变量配置
+const loadEnvConfig = () => {
+  const config = {};
 
-console.log(c.yellow('Config:'), mergedConfig);
+  Object.keys(ENV_TYPES).forEach(key => {
+    config[key] = process.env[key] !== undefined ? process.env[key] : DEFAULT_CONFIG[key];
+    if (ENV_TRANSFORMERS[key]) {
+      try {
+        config[key] = ENV_TRANSFORMERS[key](config[key]);
+      } catch (error) {
+        throw new Error(`Invalid environment variable: ${key}=${config[key]}`);
+      }
+    }
+    if (config[key] && Object.prototype.toString.call(config[key]) !== `[object ${ENV_TYPES[key][0].toUpperCase() + ENV_TYPES[key].slice(1)}]`) {
+      throw new Error(`Invalid environment variable: ${key}=${config[key]}`);
+    }
+  })
+  return config;
+}
 
-export default mergedConfig;
+// 合并配置
+const config = {
+  ...DEFAULT_CONFIG,
+  ...loadEnvConfig(),
+}
+
+console.log(c.yellow('Config:'), config);
+
+export default config;
