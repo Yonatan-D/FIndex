@@ -34,22 +34,30 @@ const ENV_TRANSFORMERS = {
   IP_WHITE_LIST: (value) => value.split(',').map(i => i.trim()).filter(Boolean),
 }
 
+const firstUpperCase = ([first, ...rest]) => first?.toUpperCase() + rest.join('');
+
 // 加载环境变量配置
 const loadEnvConfig = () => {
   const config = {};
 
   Object.keys(ENV_TYPES).forEach(key => {
-    config[key] = process.env[key] !== undefined ? process.env[key] : DEFAULT_CONFIG[key];
-    if (ENV_TRANSFORMERS[key]) {
+    let value = process.env[key];
+    if (!value) return;
+
+    const transformer = ENV_TRANSFORMERS[key];
+    if (transformer) {
       try {
-        config[key] = ENV_TRANSFORMERS[key](config[key]);
+        value = transformer(value);
       } catch (error) {
-        throw new Error(`Invalid environment variable: ${key}=${config[key]}`);
+        throw new Error(`Invalid environment variable: ${key}=${value}`);
       }
     }
-    if (config[key] && Object.prototype.toString.call(config[key]) !== `[object ${ENV_TYPES[key][0].toUpperCase() + ENV_TYPES[key].slice(1)}]`) {
-      throw new Error(`Invalid environment variable: ${key}=${config[key]}`);
+    const type = ENV_TYPES[key];
+    if (Object.prototype.toString.call(value) !== `[object ${firstUpperCase(type)}]`) {
+      throw new Error(`Invalid environment variable: ${key}=${value}`);
     }
+    
+    config[key] = value;
   })
   return config;
 }
