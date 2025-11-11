@@ -10,4 +10,4 @@ services:
     volumes:
       - /home/yonatan/test:/data/node1:ro
       - /home/yonatan/pkg:/data/node2:ro
-    env_file: .env.docker
+    env_file: .env
