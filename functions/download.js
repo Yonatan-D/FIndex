@@ -1,10 +1,8 @@
 import fs from "fs";
 import archiver from "archiver";
 import config from "../config.js";
-import { logger } from "../middlewares/log.js";
 import dayjs from "dayjs";
 import { filesize } from 'filesize';
-const log = logger();
 const { BUCKETS } = config;
 
 const getAbsolutePath = (url) => {
@@ -13,16 +11,12 @@ const getAbsolutePath = (url) => {
   const absolutePath = urlWithoutParams
     .replace(`/${node.name}`, node.path)
     .replace(/\/$/, "");
-  const fileName = absolutePath.split('/').pop() + '.zip';
-  log.info(`[Download] "%s" Requested path: "%s", Mapped to: "%s"`, fileName, urlWithoutParams, absolutePath);
-  return absolutePath;
+  return { absolutePath, urlWithoutParams };
 };
 
 const createZipFile = (sourceDir) => {
   return new Promise((resolve, reject) => {
-    const startTime = Date.now();
     const fileName = sourceDir.split('/').pop() + '.zip';
-    log.info(`[Download] "%s" Downloading directory: "%s", Creating zip file...`, fileName, sourceDir);
 
     const tempDir = `/tmp/FIndex/${dayjs().format('YYYYMMDD')}/`;
     fs.mkdirSync(tempDir, { recursive: true });
@@ -40,22 +34,13 @@ const createZipFile = (sourceDir) => {
     zip.finalize();
 
     archive.on("close", () => {
-      const durationTime = Date.now() - startTime;
-      const stats = fs.statSync(outPath);
-      log.info(`[Download] "%s" Created successfully. OutPath: "%s", Size: %s, DurationTime: %d ms`, fileName, outPath, filesize(stats.size), durationTime);
       resolve(outPath);
     });
   });
 };
 
 const cleanUpZipFile = (tempFilePath) => {
-  const fileName = tempFilePath.split('/').pop();
-  try {
-    fs.unlinkSync(tempFilePath);
-    log.info(`[Download] "%s" Cleaned up temporary file`, fileName);
-  } catch (error) {
-    log.error(`[Download] "%s" Failed to clean up temporary file:\n %s`, fileName, error);
-  }
+  fs.unlinkSync(tempFilePath);
 };
 
 export default async (req, res, next) => {
@@ -64,25 +49,31 @@ export default async (req, res, next) => {
   let absolutePath = "";
   let tempZipFilePath = "";
   try {
-    const absolutePath = getAbsolutePath(req.originalUrl);
+    const { absolutePath, urlWithoutParams } = getAbsolutePath(req.originalUrl);
+    const fileName = absolutePath.split('/').pop() + '.zip';
+    req.logger.info(`[Download] "%s" Requested path: "%s", Mapped to: "%s"`, fileName, urlWithoutParams, absolutePath);
 
     if (fs.statSync(absolutePath).isFile()) return next();
 
+    req.logger.info(`[Download] "%s" Downloading directory: "%s", Creating zip file...`, fileName, absolutePath);
+    const startTime = Date.now();
     tempZipFilePath = await createZipFile(absolutePath);
+    const durationTime = Date.now() - startTime;
+    const stats = fs.statSync(tempZipFilePath);
+    req.logger.info(`[Download] "%s" Created successfully. OutPath: "%s", Size: %s, DurationTime: %d ms`, fileName, tempZipFilePath, filesize(stats.size), durationTime);
 
     res.download(tempZipFilePath, (err) => {
-      const fileName = tempZipFilePath.split('/').pop();
       if (err) {
-        log.error(`[Download] "%s" Error sending file:\n %s`, fileName, err);
+        req.logger.error(`[Download] "%s" Error sending file "%s" :\n %s`, fileName, tempZipFilePath, err);
         cleanUpZipFile(tempZipFilePath);
         return res.status(500).send("处理失败");
       }
 
-      log.info(`[Download] "%s" Successfully sent file`, fileName);
+      req.logger.info(`[Download] "%s" Successfully sent file`, fileName);
       cleanUpZipFile(tempZipFilePath);
     });
   } catch (err) {
-    log.error(`[Download] Error processing: %s\n %s`, absolutePath, err);
+    req.logger.error(`[Download] Error processing: %s\n %s`, absolutePath, err);
     // 统一清理临时文件
     if (tempZipFilePath && fs.existsSync(tempZipFilePath)) {
       cleanUpZipFile(tempZipFilePath);
