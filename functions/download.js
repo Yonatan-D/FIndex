@@ -43,6 +43,18 @@ const cleanUpZipFile = (tempFilePath) => {
   fs.unlinkSync(tempFilePath);
 };
 
+const download = async (filePath, res) => {
+  return new Promise((resolve, reject) => {
+    res.download(filePath, (err) => {
+      if (err) {
+        reject(err);
+      } else {
+        resolve();
+      }
+    });
+  })
+}
+
 export default async (req, res, next) => {
   if (req.query.download === undefined) return next();
 
@@ -50,31 +62,21 @@ export default async (req, res, next) => {
   let tempZipFilePath = "";
   try {
     const { absolutePath, urlWithoutParams } = getAbsolutePath(req.originalUrl);
+    if (fs.statSync(absolutePath).isFile()) {
+      return download(absolutePath, res);
+    }
     const fileName = absolutePath.split('/').pop() + '.zip';
-    req.logger.info(`[Download] "%s" Requested path: "%s", Mapped to: "%s"`, fileName, urlWithoutParams, absolutePath);
-
-    if (fs.statSync(absolutePath).isFile()) return next();
-
-    req.logger.info(`[Download] "%s" Downloading directory: "%s", Creating zip file...`, fileName, absolutePath);
+    req.logger.info(`[Download] "%s" Requested path: "%s", Mapped to: "%s", Creating zip file...`, fileName, urlWithoutParams, absolutePath);
     const startTime = Date.now();
     tempZipFilePath = await createZipFile(absolutePath);
     const durationTime = Date.now() - startTime;
     const stats = fs.statSync(tempZipFilePath);
     req.logger.info(`[Download] "%s" Created successfully. OutPath: "%s", Size: %s, DurationTime: %d ms`, fileName, tempZipFilePath, filesize(stats.size), durationTime);
 
-    res.download(tempZipFilePath, (err) => {
-      if (err) {
-        req.logger.error(`[Download] "%s" Error sending file "%s" :\n %s`, fileName, tempZipFilePath, err);
-        cleanUpZipFile(tempZipFilePath);
-        return res.status(500).send("处理失败");
-      }
-
-      req.logger.info(`[Download] "%s" Successfully sent file`, fileName);
-      cleanUpZipFile(tempZipFilePath);
-    });
+    await download(tempZipFilePath, res);
+    cleanUpZipFile(tempZipFilePath);
   } catch (err) {
     req.logger.error(`[Download] Error processing: %s\n %s`, absolutePath, err);
-    // 统一清理临时文件
     if (tempZipFilePath && fs.existsSync(tempZipFilePath)) {
       cleanUpZipFile(tempZipFilePath);
     }
