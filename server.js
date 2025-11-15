@@ -7,7 +7,7 @@ import config from './config.js';
 import auth from './middlewares/auth.js';
 import log from './middlewares/log.js';
 import download from './middlewares/download.js';
-import home from './functions/home.js';
+import home from './middlewares/home.js';
 import template from './functions/template.js';
 const { APP_ROOT, BUCKETS, PORT } = config;
 
