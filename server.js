@@ -1,6 +1,8 @@
 import c from 'kleur';
 import express from 'express';
 import serveIndex from 'serve-index';
+import helmet from 'helmet';
+import compression from 'compression';
 import path from 'path';
 import 'dotenv/config';
 import config from './config.js';
@@ -12,6 +14,8 @@ import template from './functions/template.js';
 const { APP_ROOT, BUCKETS, PORT } = config;
 
 const app = express();
+app.use(helmet());
+app.use(compression());
 app.use(log);
 
 console.log(c.yellow('Loading buckets:'));
@@ -27,7 +31,10 @@ for (const node of BUCKETS) {
   console.log(c.yellow(node.name + ': ' + node.path));
 }
 
-app.use('/public', express.static(path.resolve(APP_ROOT, './pages/public')));
+app.use('/public', express.static(path.resolve(APP_ROOT, './pages/public'), {
+  maxAge: '1d',
+  etag: true,
+}));
 
 app.get('/', auth, home);
 
