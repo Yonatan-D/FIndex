@@ -1,6 +1,4 @@
 import c from 'kleur';
-import dayjs from "dayjs";
-import config from "../config.js";
 import { checkAuth } from "./auth.js";
 import Logger from '../lib/logger.js';
 
