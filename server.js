@@ -1,7 +1,6 @@
 import c from 'kleur';
 import express from 'express';
 import serveIndex from 'serve-index';
-import helmet from 'helmet';
 import compression from 'compression';
 import path from 'path';
 import 'dotenv/config';
@@ -14,7 +13,7 @@ import template from './functions/template.js';
 const { APP_ROOT, BUCKETS, PORT } = config;
 
 const app = express();
-app.use(helmet());
+app.set('x-powered-by', false);
 app.use(compression());
 app.use(log);
 
