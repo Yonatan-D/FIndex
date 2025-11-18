@@ -6,7 +6,7 @@ import mime from 'mime-types';
 import 'dayjs/locale/zh-cn.js';
 import relativeTime from 'dayjs/plugin/relativeTime.js';
 import config from '../config.js';
-const { APP_ROOT, TITLE } = config;
+const { APP_ROOT, PREFIX, TITLE } = config;
 
 // dayjs.locale('zh-cn');
 dayjs.extend(relativeTime);
@@ -163,6 +163,7 @@ export default async (locals, callback) => {
     "{linked-path}": locals.directory,
     "{files}": generateFileList(locals.fileList),
     "{style}": getStyle(locals.fileList),
+    "{home}": PREFIX,
   }
   let renderContent = templateContent;
   for (const [key, value] of Object.entries(replacements)) {

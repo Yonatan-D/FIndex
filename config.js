@@ -11,6 +11,7 @@ const getAppRoot = () => {
 // 环境变量类型定义
 const ENV_TYPES = {
   PORT: 'number',
+  PREFIX: 'string',
   TITLE: 'string',
   BUCKETS: 'array',
   IP_WHITE_LIST: 'array',
@@ -21,6 +22,7 @@ const ENV_TYPES = {
 const DEFAULT_CONFIG = {
   APP_ROOT: getAppRoot(),
   PORT: 3000,
+  PREFIX: '/',
   TITLE: 'FIndex',
   BUCKETS: [],
   IP_WHITE_LIST: [],
