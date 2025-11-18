@@ -13,157 +13,157 @@ export const createTemplateRenderer = (config) => {
   const { title, prefix, iconPath, templatePath } = config;
   const cache = {};
   
-  return async (locals, callback) => {
-    const load = (icon) => {
-      if (cache[icon]) return cache[icon];
-      console.log('========> icon', iconPath);
-      
-      return cache[icon] = fs.readFileSync(`${iconPath}/${icon}`, 'base64');
+  const load = (icon) => {
+    if (cache[icon]) return cache[icon];
+    console.log('========> icon', iconPath);
+    
+    return cache[icon] = fs.readFileSync(`${iconPath}/${icon}`, 'base64');
+  };
+
+  const getStyle = (fileList) => {
+    const rules = {};
+    fileList.forEach(file => {
+      const icon = getIcon(file.name);
+      if (!rules[icon.className]) {
+        rules[icon.className] = {
+          selector: `#files .${icon.className} .name`,
+          content: `background-image: url(data:image/png;base64,${load(icon.fileName)});`,
+        };
+      }
+    });
+    rules['icon-directory'] = {
+      selector: '#files .icon-directory .name',
+      content: `background-image: url(data:image/png;base64,${load(icons.folder)});`,
     };
+    const style = [];
+    for (const iconName in rules) {
+      style.push(`${rules[iconName].selector} {\n  ${rules[iconName].content}\n}`);
+    }
+    return style.join('\n');
+  };
+
+  const getIcon = (filename) => {
+    const ext = path.extname(filename);
   
-    const getStyle = (fileList) => {
-      const rules = {};
-      fileList.forEach(file => {
-        const icon = getIcon(file.name);
-        if (!rules[icon.className]) {
-          rules[icon.className] = {
-            selector: `#files .${icon.className} .name`,
-            content: `background-image: url(data:image/png;base64,${load(icon.fileName)});`,
-          };
-        }
-      });
-      rules['icon-directory'] = {
-        selector: '#files .icon-directory .name',
-        content: `background-image: url(data:image/png;base64,${load(icons.folder)});`,
+    // try by extension
+    if (icons[ext]) {
+      return {
+        className: 'icon-' + ext.substring(1),
+        fileName: icons[ext]
       };
-      const style = [];
-      for (const iconName in rules) {
-        style.push(`${rules[iconName].selector} {\n  ${rules[iconName].content}\n}`);
-      }
-      return style.join('\n');
-    };
+    }
   
-      const getIcon = (filename) => {
-      const ext = path.extname(filename);
-    
-      // try by extension
-      if (icons[ext]) {
-        return {
-          className: 'icon-' + ext.substring(1),
-          fileName: icons[ext]
-        };
-      }
-    
-      const mimetype = mime.lookup(ext);
-    
-      // default if no mime type
-      if (mimetype === false) {
-        return {
-          className: 'icon-default',
-          fileName: icons.default
-        };
-      }
-    
-      // try by mime type
-      if (icons[mimetype]) {
-        return {
-          className: 'icon-' + mimetype.replace('/', '-'),
-          fileName: icons[mimetype]
-        };
-      }
-    
-      const suffix = mimetype.split('+')[1];
-    
-      if (suffix && icons['+' + suffix]) {
-        return {
-          className: 'icon-' + suffix,
-          fileName: icons['+' + suffix]
-        };
-      }
-    
-      const type = mimetype.split('/')[0];
-    
-      // try by type only
-      if (icons[type]) {
-        return {
-          className: 'icon-' + type,
-          fileName: icons[type]
-        };
-      }
-    
+    const mimetype = mime.lookup(ext);
+  
+    // default if no mime type
+    if (mimetype === false) {
       return {
         className: 'icon-default',
         fileName: icons.default
       };
-    };
+    }
   
-    const getClassName = (file) => {
-      const classes = [];
-      const isDir = file.stat && file.stat.isDirectory();
-      
-      if (locals.displayIcons) {
-        classes.push('icon');
-        if (isDir) {
-          classes.push('icon-directory');
-        } else {
-          const icon = getIcon(file.name);
-          classes.push(icon.className);
-        }
+    // try by mime type
+    if (icons[mimetype]) {
+      return {
+        className: 'icon-' + mimetype.replace('/', '-'),
+        fileName: icons[mimetype]
+      };
+    }
+  
+    const suffix = mimetype.split('+')[1];
+  
+    if (suffix && icons['+' + suffix]) {
+      return {
+        className: 'icon-' + suffix,
+        fileName: icons['+' + suffix]
+      };
+    }
+  
+    const type = mimetype.split('/')[0];
+  
+    // try by type only
+    if (icons[type]) {
+      return {
+        className: 'icon-' + type,
+        fileName: icons[type]
+      };
+    }
+  
+    return {
+      className: 'icon-default',
+      fileName: icons.default
+    };
+  };
+
+  const getClassName = (displayIcons, file) => {
+    const classes = [];
+    const isDir = file.stat && file.stat.isDirectory();
+    
+    if (displayIcons) {
+      classes.push('icon');
+      if (isDir) {
+        classes.push('icon-directory');
+      } else {
+        const icon = getIcon(file.name);
+        classes.push(icon.className);
       }
-  
-      return classes.join(' ');
-    };
-  
-    const generateFileList = (fileList) => {
-      let list = fileList.map(file => {
-        const isDir = file.stat && file.stat.isDirectory();
-        const url = isDir
-          ? file.name + '/'
-          : file.name;
-        const size = !isDir
-          ? filesize(file.stat.size)
-          : '';
-        const date = file.stat && file.name !== '..'
-          ? dayjs(file.stat.mtime).format('YYYY-MM-DD HH:mm:ss')
-          : '';
-        const fromNowDate = file.stat && file.name !== '..'
-          ? dayjs(file.stat.mtime).fromNow()
-          : '';
-  
-        return `
-          <li>
-            <a href="${url}" class="${getClassName(file)}">
-              <span class="name">${file.name}</span>
-              <span class="size">${size}</span>
-              <span class="date" title="${date}">${fromNowDate}</span>
-            </a>
-          </li>
-        `
-      });
-      list.unshift(
-        `<li class="header">
-          <span class="name">Name</span>
-          <span class="size">Size</span>
-          <span class="date">Modified</span>
-        </li>`
-      );
-      list = `<ul id="files" class="view-${locals.viewName}">${list.join('')}</ul>`;
-      return list;
-    };
-  
-    const getTitle = () => {
-      const currentDirectory = locals.directory
-        .split('/')
-        .filter(Boolean)
-        .pop();
-      return `${currentDirectory} | ${title}`;
     }
 
+    return classes.join(' ');
+  };
+
+  const generateFileList = (locals) => {
+    let list = locals.fileList.map(file => {
+      const isDir = file.stat && file.stat.isDirectory();
+      const url = isDir
+        ? file.name + '/'
+        : file.name;
+      const size = !isDir
+        ? filesize(file.stat.size)
+        : '';
+      const date = file.stat && file.name !== '..'
+        ? dayjs(file.stat.mtime).format('YYYY-MM-DD HH:mm:ss')
+        : '';
+      const fromNowDate = file.stat && file.name !== '..'
+        ? dayjs(file.stat.mtime).fromNow()
+        : '';
+
+      return `
+        <li>
+          <a href="${url}" class="${getClassName(locals.displayIcons, file)}">
+            <span class="name">${file.name}</span>
+            <span class="size">${size}</span>
+            <span class="date" title="${date}">${fromNowDate}</span>
+          </a>
+        </li>
+      `
+    });
+    list.unshift(
+      `<li class="header">
+        <span class="name">Name</span>
+        <span class="size">Size</span>
+        <span class="date">Modified</span>
+      </li>`
+    );
+    list = `<ul id="files" class="view-${locals.viewName}">${list.join('')}</ul>`;
+    return list;
+  };
+
+  const getTitle = (locals) => {
+    const currentDirectory = locals.directory
+      .split('/')
+      .filter(Boolean)
+      .pop();
+    return `${currentDirectory} | ${title}`;
+  }
+
+  return async (locals, callback) => {
     const templateContent = fs.readFileSync(templatePath, 'utf-8');
     const replacements = {
-      "{title}": getTitle(),
+      "{title}": getTitle(locals),
       "{linked-path}": locals.directory,
-      "{files}": generateFileList(locals.fileList),
+      "{files}": generateFileList(locals),
       "{style}": getStyle(locals.fileList),
       "{home}": prefix,
     }
