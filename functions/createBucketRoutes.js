@@ -4,16 +4,21 @@ import serveIndex from 'serve-index';
 import download from '../middlewares/download.js';
 import home from '../middlewares/home.js';
 import path from 'path';
-import template from './template.js';
+import { createTemplateRenderer } from './template.js';
 import config from '../config.js';
-const { APP_ROOT, BUCKETS } = config;
+const { APP_ROOT, PREFIX, BUCKETS, TITLE } = config;
 
 const DEFAULT_OPTIONS = {
   SERVE_INDEX_OPTIONS: {
     icons: true,
     view: 'details',
     // template: path.resolve(APP_ROOT, './pages/directory.html')
-    template,
+    template: createTemplateRenderer({
+      title: TITLE,
+      prefix: PREFIX,
+      iconPath: path.resolve(APP_ROOT, './pages/icons/'),
+      templatePath: path.resolve(APP_ROOT, './pages/directory.html'),
+    }),
   },
   STATIC_OPTIONS: {
     maxAge: '1d',
