@@ -34,7 +34,7 @@ export default async (req, res, next) => {
         };
         let renderContent = templateContent;
         for (const [key, value] of Object.entries(replacements)) {
-          renderContent = renderContent.replace(key, value);
+          renderContent = renderContent.replaceAll(key, value);
         }
         this.push(renderContent);
         callback();

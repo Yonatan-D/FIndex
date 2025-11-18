@@ -167,7 +167,7 @@ export default async (locals, callback) => {
   }
   let renderContent = templateContent;
   for (const [key, value] of Object.entries(replacements)) {
-    renderContent = renderContent.replace(key, value);
+    renderContent = renderContent.replaceAll(key, value);
   }
   callback(null, renderContent);
 };
