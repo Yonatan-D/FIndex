@@ -1,7 +1,6 @@
 import c from 'kleur';
 import express from 'express';
 import serveIndex from 'serve-index';
-import auth from '../middlewares/auth.js';
 import download from '../middlewares/download.js';
 import home from '../middlewares/home.js';
 import path from 'path';
@@ -31,7 +30,6 @@ const createBucketRoutes = (buckets, options = {}) => {
   buckets.forEach(node => {
     const routePath = `/${encodeURIComponent(node.name)}`;
     const middlewares = [
-      auth,
       download,
       express.static(node.path),
       serveIndex(node.path, SERVE_INDEX_OPTIONS)
@@ -56,7 +54,7 @@ const createPublicRoutes = (publicPath, options = {}) => {
 const createHomeRoutes = () => {
   const router = express.Router();
 
-  router.use('/', auth, home);
+  router.use('/', home);
 
   return router;
 }
