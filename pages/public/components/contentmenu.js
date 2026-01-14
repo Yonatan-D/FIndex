@@ -59,7 +59,7 @@ class ContextMenu extends HTMLElement {
       this.closeContextMenu();
       return;
     }
-    if (link?.firstElementChild?.textContent === '..')
+    if (link.firstElementChild.textContent === '..')
       return;
     const { pageX, pageY } = event;
     Object.assign(this.contextMenu.style, {
