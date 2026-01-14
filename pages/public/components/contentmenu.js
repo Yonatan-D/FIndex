@@ -40,6 +40,7 @@ class ContextMenu extends HTMLElement {
       </style>
       <ul>
         <li>预览</li>
+        <li>复制链接</li>
         <li>下载</li>
       </ul>
     `;
@@ -86,6 +87,15 @@ class ContextMenu extends HTMLElement {
     switch (type) {
       case '预览':
         alert('🚧施工中');
+        break;
+      case '复制链接':
+        navigator.clipboard.writeText(`${window.location.href}${fileUrl}?download`)
+        .then(() => {
+          console.log('复制成功！');
+        })
+        .catch(err => {
+          console.error('复制失败：', err);
+        });
         break;
       case '下载':
         const link = document.createElement('a');
