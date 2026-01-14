@@ -1,6 +1,8 @@
 import c from 'kleur';
 import { checkAuth } from "./auth.js";
 import Logger from '../lib/logger.js';
+import config from "../config.js";
+const { PREFIX } = config;
 
 export default async (req, res, next) => {
 
@@ -8,7 +10,7 @@ export default async (req, res, next) => {
 
   const filterRules = [
     '/favicon.ico',
-    '/public/',
+    `${PREFIX}public/`,
   ];
 
   const start = Date.now();
