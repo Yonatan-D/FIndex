@@ -1,9 +1,10 @@
 import config from "../config.js";
-const { IP_WHITE_LIST, TOKEN } = config;
+const { IP_WHITE_LIST, TOKEN, PREFIX } = config;
 
 export const checkAuth = (req) => {
   const allowHost = IP_WHITE_LIST.includes(req.hostname);
   const allowToken = req.query?.token === TOKEN || req.headers.cookie?.includes(`x-token=${TOKEN}`);
+  const allowPublic = req.originalUrl.startsWith(`${PREFIX}public/`);
   if (!TOKEN) {
     return {
       status: true,
@@ -20,6 +21,12 @@ export const checkAuth = (req) => {
     return {
       status: true,
       message: "token",
+    };
+  }
+  if (allowPublic) {
+    return {
+      status: true,
+      message: "public",
     };
   }
   return {
